@@ -30,3 +30,5 @@ TEST(OSMTest, SimpleFiles){
     EXPECT_EQ(TempNode->Location(),std::make_pair(38.5,-121.7));
 
 }
+
+TEST(OSMTest, )
