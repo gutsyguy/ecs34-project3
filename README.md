@@ -2,17 +2,17 @@
 
 Student 1: Partner1 Name (123456789)
 
-Student 2: Partner2 Name (123456987)
+Student 2: Kevin Jia (921898728)
 
 ## Project Status
-This the current status of the project ...
+This the current status of the project work in progress
 
 ## Known Issues
-The project fails to function properly in ...
+Currently the OpenStreetMap function does not function properly
 
 ## Code References
 * [Different ways to initialize variables](https://stackoverflow.com/questions/22543875/different-ways-to-initialize-variables)
-* [Some other link](https://stackoverflow.com)
+* [C++ Refernce](https://cplusplus.com/reference/)
 
 ## Generative AI Use
 I used ChatGPT for Prompt 1, and ZZZZZ for Prompt 2....
