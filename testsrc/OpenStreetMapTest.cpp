@@ -2,7 +2,7 @@
 #include "OpenStreetMap.h"
 #include "StringDataSource.h"
 
-TEST(OSMTest, SimpleFiles){
+TEST(OSMTest, SimpleFiles){ // Provided Test Case
     auto OSMDataSource = std::make_shared< CStringDataSource >("<?xml version='1.0' encoding='UTF-8'?>\n"
                                                                 "<osm version=\"0.6\" generator=\"osmconvert 0.8.5\">\n"
 	                                                            "  <node id=\"1\" lat=\"38.5\" lon=\"-121.7\"/>\n"
@@ -31,7 +31,7 @@ TEST(OSMTest, SimpleFiles){
 
 }
 
-TEST(OSMTest, ObscureFiles){
+TEST(OSMTest, ObscureFiles){ // Based on provided test case
     auto OSMDataSource = std::make_shared< CStringDataSource >("<?xml version='1.0' encoding='UTF-8'?>\n"
                                                                 "<osm version=\"0.6\" generator=\"osmconvert 0.8.5\">\n"
 	                                                            "  <node id=\"1\" lat=\"38.5\" lon=\"-121.7\"/>\n"
@@ -45,9 +45,9 @@ TEST(OSMTest, ObscureFiles){
     auto OSMReader = std::make_shared< CXMLReader >(OSMDataSource);
     COpenStreetMap OpenStreetMap(OSMReader);
 
-    EXPECT_EQ(OpenStreetMap.NodeCount(),2);
-    EXPECT_EQ(OpenStreetMap.WayCount(),1);
-    EXPECT_NE(OpenStreetMap.NodeByIndex(0),nullptr);
+    EXPECT_EQ(OpenStreetMap.NodeCount(),2);  
+    EXPECT_EQ(OpenStreetMap.WayCount(),1); // my way or the highway
+    EXPECT_NE(OpenStreetMap.NodeByIndex(0),nullptr); // you should exist
     EXPECT_NE(OpenStreetMap.NodeByIndex(1),nullptr);
     EXPECT_EQ(OpenStreetMap.NodeByIndex(2),nullptr);
     EXPECT_NE(OpenStreetMap.WayByIndex(0),nullptr);
@@ -74,7 +74,7 @@ TEST(OSMTest, EmptyFiles){
     EXPECT_EQ(OpenStreetMap.WayByID(1),nullptr);
 }
 
-TEST(OSMTest, EmptyFile_NoNodesOrWays){
+TEST(OSMTest, NoNodesOrWaysFile){ // valid xml. but nothing there
     auto OSMDataSource = std::make_shared< CStringDataSource >("<?xml version='1.0' encoding='UTF-8'?>\n"
                                                                 "<osm version=\"0.6\" generator=\"unit_test\">\n"
                                                                 "</osm>\n"
@@ -82,14 +82,14 @@ TEST(OSMTest, EmptyFile_NoNodesOrWays){
     auto OSMReader = std::make_shared< CXMLReader >(OSMDataSource);
     COpenStreetMap OpenStreetMap(OSMReader);
 
-    EXPECT_EQ(OpenStreetMap.NodeCount(),0);
-    EXPECT_EQ(OpenStreetMap.WayCount(),0);
+    EXPECT_EQ(OpenStreetMap.NodeCount(),0); // nope
+    EXPECT_EQ(OpenStreetMap.WayCount(),0); // double nope
     EXPECT_EQ(OpenStreetMap.NodeByIndex(0), nullptr);
     EXPECT_EQ(OpenStreetMap.WayByIndex(0), nullptr);
     EXPECT_EQ(OpenStreetMap.NodeByID(1), nullptr);
 }
 
-TEST(OSMTest, NodesOnlyFile){
+TEST(OSMTest, NodesOnlyFile){ // no roads. gotta carve a path
     auto OSMDataSource = std::make_shared< CStringDataSource >("<?xml version='1.0' encoding='UTF-8'?>\n"
                                                                 "<osm version=\"0.6\" generator=\"unit_test\">\n"
                                                                 "  <node id=\"10\" lat=\"38.10\" lon=\"-121.10\"/>\n"
