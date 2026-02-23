@@ -143,3 +143,103 @@ TEST(CSVBusSystem, OutOfOrderHeaders)
     auto RouteObj = BusSystem.RouteByName("A");
     ASSERT_NE(RouteObj, nullptr);
 }
+
+TEST(CSVBusSystem, Accessors)
+{
+    auto StopDataSource = std::make_shared<CStringDataSource>("stop_id,node_id\n"
+                                                              "1,123\n"
+                                                              "2,124");
+    auto StopReader = std::make_shared<CDSVReader>(StopDataSource, ',');
+    auto RouteDataSource = std::make_shared<CStringDataSource>("route,stop_id\n"
+                                                               "A,1\n"
+                                                               "B,2");
+    auto RouteReader = std::make_shared<CDSVReader>(RouteDataSource, ',');
+
+    CCSVBusSystem BusSystem(StopReader, RouteReader);
+
+    // StopByIndex
+    EXPECT_NE(BusSystem.StopByIndex(0), nullptr);
+    EXPECT_NE(BusSystem.StopByIndex(1), nullptr);
+    EXPECT_EQ(BusSystem.StopByIndex(2), nullptr);
+
+    // RouteByIndex
+    EXPECT_NE(BusSystem.RouteByIndex(0), nullptr);
+    EXPECT_NE(BusSystem.RouteByIndex(1), nullptr);
+    EXPECT_EQ(BusSystem.RouteByIndex(2), nullptr);
+
+    // StopByID
+    EXPECT_EQ(BusSystem.StopByID(999), nullptr);
+
+    // RouteByName
+    EXPECT_EQ(BusSystem.RouteByName("Invalid"), nullptr);
+}
+
+TEST(CSVBusSystem, HeaderErrors)
+{
+    // Missing stop_id header
+    auto StopDataSource1 = std::make_shared<CStringDataSource>("wrong_id,node_id\n1,123");
+    auto StopReader1 = std::make_shared<CDSVReader>(StopDataSource1, ',');
+    auto RouteDataSource1 = std::make_shared<CStringDataSource>("route,stop_id\nA,1");
+    auto RouteReader1 = std::make_shared<CDSVReader>(RouteDataSource1, ',');
+    CCSVBusSystem BusSystem1(StopReader1, RouteReader1);
+    EXPECT_EQ(BusSystem1.StopCount(), 0);
+
+    // Missing node_id header
+    auto StopDataSource2 = std::make_shared<CStringDataSource>("stop_id,wrong_id\n1,123");
+    auto StopReader2 = std::make_shared<CDSVReader>(StopDataSource2, ',');
+    CCSVBusSystem BusSystem2(StopReader2, RouteReader1);
+    EXPECT_EQ(BusSystem2.StopCount(), 0);
+
+    // Missing route header
+    auto StopDataSource3 = std::make_shared<CStringDataSource>("stop_id,node_id\n1,123");
+    auto StopReader3 = std::make_shared<CDSVReader>(StopDataSource3, ',');
+    auto RouteDataSource2 = std::make_shared<CStringDataSource>("wrong_header,stop_id\nA,1");
+    auto RouteReader2 = std::make_shared<CDSVReader>(RouteDataSource2, ',');
+    CCSVBusSystem BusSystem3(StopReader3, RouteReader2);
+    EXPECT_EQ(BusSystem3.RouteCount(), 0);
+}
+
+TEST(CSVBusSystem, CompletelyEmpty)
+{
+    // Completely empty data sources (no headers)
+    auto StopDataSource = std::make_shared<CStringDataSource>("");
+    auto StopReader = std::make_shared<CDSVReader>(StopDataSource, ',');
+    auto RouteDataSource = std::make_shared<CStringDataSource>("");
+    auto RouteReader = std::make_shared<CDSVReader>(RouteDataSource, ',');
+
+    CCSVBusSystem BusSystem(StopReader, RouteReader);
+
+    EXPECT_EQ(BusSystem.StopCount(), 0);
+    EXPECT_EQ(BusSystem.RouteCount(), 0);
+}
+
+TEST(CSVBusSystem, EmptyRouteFile)
+{
+    // Valid stops, but route file is completely empty (no header)
+    auto StopDataSource = std::make_shared<CStringDataSource>("stop_id,node_id\n1,123");
+    auto StopReader = std::make_shared<CDSVReader>(StopDataSource, ',');
+    auto RouteDataSource = std::make_shared<CStringDataSource>("");
+    auto RouteReader = std::make_shared<CDSVReader>(RouteDataSource, ',');
+
+    CCSVBusSystem BusSystem(StopReader, RouteReader);
+
+    EXPECT_EQ(BusSystem.StopCount(), 1);
+    EXPECT_EQ(BusSystem.RouteCount(), 0);
+}
+
+TEST(CSVBusSystem, ShortRouteRow)
+{
+    // Route row has fewer columns than the header indicates
+    auto StopDataSource = std::make_shared<CStringDataSource>("stop_id,node_id\n1,123");
+    auto StopReader = std::make_shared<CDSVReader>(StopDataSource, ',');
+    auto RouteDataSource = std::make_shared<CStringDataSource>("route,stop_id\n"
+                                                               "A,1\n"
+                                                               "B"); // Missing stop_id
+    auto RouteReader = std::make_shared<CDSVReader>(RouteDataSource, ',');
+
+    CCSVBusSystem BusSystem(StopReader, RouteReader);
+
+    EXPECT_EQ(BusSystem.RouteCount(), 1); // Only route A should be loaded
+    EXPECT_NE(BusSystem.RouteByName("A"), nullptr);
+    EXPECT_EQ(BusSystem.RouteByName("B"), nullptr);
+}
