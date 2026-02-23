@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuites tests="2" failures="0" disabled="0" errors="0" time="0." timestamp="2026-02-22T21:56:15.819" name="AllTests">
-  <testsuite name="CSVBusSystem" tests="2" failures="0" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-02-22T21:56:15.819">
-    <testcase name="SimpleFiles" file="testsrc/CSVBusSystemTest.cpp" line="5" status="run" result="completed" time="0." timestamp="2026-02-22T21:56:15.819" classname="CSVBusSystem" />
-    <testcase name="EmptyFiles" file="testsrc/CSVBusSystemTest.cpp" line="44" status="run" result="completed" time="0." timestamp="2026-02-22T21:56:15.819" classname="CSVBusSystem" />
+<testsuites tests="2" failures="0" disabled="0" errors="0" time="0." timestamp="2026-02-23T01:36:51.010" name="AllTests">
+  <testsuite name="CSVBusSystem" tests="2" failures="0" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-02-23T01:36:51.010">
+    <testcase name="SimpleFiles" file="testsrc/CSVBusSystemTest.cpp" line="5" status="run" result="completed" time="0." timestamp="2026-02-23T01:36:51.010" classname="CSVBusSystem" />
+    <testcase name="EmptyFiles" file="testsrc/CSVBusSystemTest.cpp" line="44" status="run" result="completed" time="0." timestamp="2026-02-23T01:36:51.010" classname="CSVBusSystem" />
   </testsuite>
 </testsuites>

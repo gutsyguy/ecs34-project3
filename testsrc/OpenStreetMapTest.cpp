@@ -154,7 +154,7 @@ TEST(OSMTest, DuplicateNodesFile){
     EXPECT_EQ(OpenStreetMap.NodeByID(id->ID()), id);
 }
 
-TEST(OSMTest, NodeLocation_ExactValues){
+TEST(OSMTest, ExactValuesFile){
     auto OSMDataSource = std::make_shared< CStringDataSource >("<?xml version='1.0' encoding='UTF-8'?>\n"
                                                                 "<osm version=\"0.6\" generator=\"unit_test\">\n"
                                                                 "  <node id=\"1\" lat=\"0.0\" lon=\"0.0\"/>\n"
@@ -229,4 +229,81 @@ TEST(OSMTest, WayAttributes){
     EXPECT_EQ(way->GetAttribute("highway"), "crossing");
     EXPECT_EQ(way->GetAttribute("missing"), "");
     EXPECT_EQ(way->GetAttributeKey(way->AttributeCount()), "");
+}
+
+TEST(OSMTest, SelfInteractFile){
+    auto OSMDataSource = std::make_shared< CStringDataSource >("<?xml version='1.0' encoding='UTF-8' ?>\n"
+                                                                "<osm version=\"0.6\" generator=\"unit_test\">\n"
+                                                                "  <node id=\"1\" lat=\"0\" lon=\"0\"/>\n"
+                                                                "  <node id=\"2\" lat=\"0\" lon=\"1\"/>\n"
+                                                                "  <node id=\"3\" lat=\"1\" lon=\"1\"/>\n"
+                                                                "  <node id=\"4\" lat=\"1\" lon=\"0\"/>\n"
+                                                                "  <way id=\"200\">\n"
+                                                                "    <nd ref=\"1\"/>\n"
+                                                                "    <nd ref=\"3\"/>\n"
+                                                                "    <nd ref=\"2\"/>\n"
+                                                                "    <nd ref=\"4\"/>\n"
+                                                                "    <nd ref=\"1\"/>\n"
+                                                                "  </way>\n"
+                                                                "</osm>\n"
+                                                                );
+    auto OSMReader = std::make_shared< CXMLReader >(OSMDataSource);
+    COpenStreetMap OpenStreetMap(OSMReader);
+    auto way = OpenStreetMap.WayByID(200);
+    ASSERT_NE(way, nullptr);
+    EXPECT_EQ(way->NodeCount(), 5);
+    EXPECT_EQ(way->GetNodeID(0), 1);
+    EXPECT_EQ(way->GetNodeID(4), 1);
+}
+
+TEST(OSMTest, NoTagsFile){
+    auto OSMDataSource = std::make_shared< CStringDataSource >("<?xml version='1.0' encoding='UTF-8'?>\n"
+                                                                "<osm version=\"0.6\" generator=\"unit_test\">\n"
+                                                                "  <way id=\"100\">\n"
+                                                                "    <tag k=\"highway\"/>\n"              // no v
+                                                                "    <tag v=\"crossing\"/>\n"             // no k
+                                                                "    <tag k=\"weird:key\" v=\"123\"/>\n"  // not normal 
+                                                                "  </way>\n"
+                                                                "</osm>\n"
+                                                                );
+    auto OSMReader = std::make_shared< CXMLReader >(OSMDataSource);
+    COpenStreetMap OpenStreetMap(OSMReader);
+    auto way = OpenStreetMap.WayByID(100);
+    ASSERT_NE(way, nullptr);
+    EXPECT_EQ(way->GetAttribute("highway"), "");
+    EXPECT_EQ(way->GetAttribute("weird:key"), "123");
+}
+
+TEST(OSMTest, DuplicateIDFile){
+    auto OSMDataSource = std::make_shared< CStringDataSource >("<?xml version='1.0' encoding='UTF-8'?>\n"
+                                                                "<osm version=\"0.6\" generator=\"unit_test\">\n"
+                                                                "  <way id=\"300\"><nd ref=\"1\"/></way>\n"
+                                                                "  <way id=\"300\"><nd ref=\"2\"/></way>\n"
+                                                                "</osm>\n"
+                                                                );
+    auto OSMReader = std::make_shared< CXMLReader >(OSMDataSource);
+    COpenStreetMap OpenStreetMap(OSMReader);
+    auto way = OpenStreetMap.WayByID(300);
+    ASSERT_NE(way, nullptr);
+    EXPECT_EQ(way->ID(), 300);
+}
+
+TEST(OSMTest, DirectionIssueFile){
+    auto OSMDataSource = std::make_shared< CStringDataSource >("<?xml version='1.0' encoding='UTF-8'?>\n"
+                                                                "<osm version=\"0.6\" generator=\"unit_test\">\n"
+                                                                "  <way id=\"600\">\n"
+                                                                "    <nd ref=\"10\"/>\n"
+                                                                "    <nd ref=\"20\"/>\n"
+                                                                "    <nd ref=\"30\"/>\n"
+                                                                "    <tag k=\"oneway\" v=\"yes\"/>\n"
+                                                                "  </way>\n"
+                                                                "</osm>\n"
+                                                                );
+    auto OSMReader = std::make_shared< CXMLReader >(OSMDataSource);
+    COpenStreetMap OpenStreetMap(OSMReader);
+    auto way = OpenStreetMap.WayByID(600);
+    ASSERT_NE(way, nullptr);
+    EXPECT_EQ(way->GetNodeID(0), 10);
+    EXPECT_EQ(way->GetNodeID(1), 20);
+    EXPECT_EQ(way->GetNodeID(2), 30);
 }
