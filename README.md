@@ -1,6 +1,6 @@
 # Project 3 README
 
-Student 1: Partner1 Name (123456789)
+Student 1: Yalamber (923528180)
 
 Student 2: Kevin Jia (921898728)
 
@@ -9,10 +9,12 @@ The project is complete
 
 ## Known Issues
 Kevin: One issue I ran into was determining test cases and its syntax as, working with OSM files are something new to me.
+Yalamber: One issue I ran into was dealing with duplicate routes. 
 
 ## Code References
 * [Different ways to initialize variables](https://stackoverflow.com/questions/22543875/different-ways-to-initialize-variables)
 * [C++ Refernce](https://cplusplus.com/reference/)
+* [DSV Reference](https://www.partow.net/programming/dsvfilter/index.html)
 
 ## Generative AI Use
 I used ChatGPT for Prompt 1

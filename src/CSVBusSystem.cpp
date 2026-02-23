@@ -103,7 +103,6 @@ struct CCSVBusSystem::SImplementation
                 }
                 catch (const std::exception &E)
                 {
-                    // Skip rows with invalid numeric data
                     continue;
                 }
             }
@@ -147,7 +146,6 @@ struct CCSVBusSystem::SImplementation
                     std::string RouteName = TempRow[RouteColumn];
                     TStopID StopID = std::stoull(TempRow[StopColumn]);
 
-                    // Validate that the stop ID exists
                     if (DStopsByID.find(StopID) == DStopsByID.end())
                     {
                         continue;
@@ -169,7 +167,6 @@ struct CCSVBusSystem::SImplementation
                 }
                 catch (const std::exception &E)
                 {
-                    // Skip rows with invalid numeric data
                     continue;
                 }
             }
